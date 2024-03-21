@@ -110,52 +110,45 @@ const simulacro ={
 
 
     login: async (req, res) => {
-
         try {
-            
-            const {email, password} = req.body;
-            const user =await user.find({ email: email});
-
-            if (!user) {
+            const { email, password } = req.body;
+            const users = await user.find({ email: email });
+    
+            if (users.length === 0) {
                 return res.status(400).json({
-                    message: ' ¡invalid username  or password!   try again'
-                })
+                    message: 'Invalid username or password. Please try again.'
+                });
             }
-
-
-            const isPasswordValid = await bcrypt.compare(password, user[0].password);
-
+    
+            const isPasswordValid = await bcrypt.compare(password, users[0].password);
+    
             if (!isPasswordValid) {
-                return res.status(400).json({message: "Invalid username or password"});     
+                return res.status(400).json({ message: "Invalid username or password" });
             }
-
-            
-            const token = jwt.sign({userId:user.id}, jwt_secret,{
-                expiresIn: '1h'
-            })
-
+    
+            const token = jwt.sign({ userId: users[0]._id }, jwt_secret, {
+                expiresIn: 3600
+            });
+    
             res.json({
-                query:'OK',
+                query: 'OK',
                 success: true,
                 status: 201,
-                message: "Logged in successfully", token,
-                data: newUser
+                message: 'User logged in successfully',
+                data: token
             });
-
-
+    
         } catch (error) {
-            console.error('Error al loguear el usuario:', error);
+            console.error('Error logging in user:', error);
             res.status(500).json({
-                query:'failed',
+                query: 'failed',
                 success: false,
                 status: 500,
-                message: 'Internal Server Error' 
+                message: 'Internal Server Error'
             });
         }
-
-
-
     }
+    
 
 
 };
