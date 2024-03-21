@@ -1,0 +1,22 @@
+
+
+password:
+
+nFgFrb0li3JxbLr6
+
+
+mongodb+srv://camilo:nFgFrb0li3JxbLr6@node.ktvwioe.mongodb.net/
+
+
+
+paquetes para instalar
+
+
+mongodb
+express
+body-parser
+nodemon
+mongoose
+
+para instalar usar
+npm i
