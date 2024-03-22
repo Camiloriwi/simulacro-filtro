@@ -8,7 +8,7 @@ const connectDB = async ()=>{
     try {
 
         if(!user){
-            user = mongoose.model('camilos', require('../models/model').Schema) 
+            user = mongoose.model('users', require('../models/model').Schema) 
         }
         await mongoose.connect('mongodb+srv://camilo:nFgFrb0li3JxbLr6@node.ktvwioe.mongodb.net/')
         .then(()=>{console.log('connected to database')})

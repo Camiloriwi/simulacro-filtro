@@ -70,6 +70,58 @@ const simulacro ={
     },
 
 
+
+
+    deleteUser:  async (req, res) =>{
+        try {
+            const id = req.params._id;
+            const users = await user.findByIdAndDelete({_id:id});
+            res.json({
+                query:'OK',
+                success: true,
+                status: 201,
+                message: 'Conexión exitosa al puerto 3000, consulta realizada: /api users',
+                data: users
+            });
+            
+        } catch (error) {
+            res.status(500).json({
+                query:'failed',
+                success: false,
+                status: 500,
+                message: 'Hubo un error al realizar la eliminacion del user: /api/users/delete',
+                error: error.message
+            });
+    
+        };
+
+    },
+
+
+    updateUser:  async (req, res)=>{
+        try {
+            const id = req.params._id;
+            const users = await user.findByIdAndUpdate({_id:id},{name:'cristian'}, req.body);
+            res.json({
+                query:'OK',
+                success: true,
+                status: 201,
+                message: 'Conexión exitosa al puerto 3000, consulta realizada: /api users',
+                data: users
+            });
+            
+        } catch (error) {
+            res.status(500).json({
+                query:'failed',
+                success: false,
+                status: 500,
+                message: 'Hubo un error al realizar la actualizacion del user: /api/users/update',
+                error: error.message
+            });
+        };
+
+    },
+
     register: async (req,res)=>{
 
         try {
