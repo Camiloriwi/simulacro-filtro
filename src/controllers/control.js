@@ -97,6 +97,33 @@ const simulacro ={
 
     },
 
+    updateUsers: async (req, res) => {
+        try {
+            const id = req.params._id;
+            const updateData = req.body; // Aquí capturamos los datos enviados desde el formulario
+    
+
+            const users = await user.findByIdAndUpdate(id, updateData, { new: true });
+    
+            res.json({
+                query: 'OK',
+                success: true,
+                status: 201,
+                message: 'Conexión exitosa al puerto 3000, consulta realizada: /api users',
+                data: users
+            });
+    
+        } catch (error) {
+            res.status(500).json({
+                query: 'failed',
+                success: false,
+                status: 500,
+                message: 'Hubo un error al realizar la actualizacion del user: /api/users/update',
+                error: error.message
+            });
+        };
+    },
+    
 
     updateUser:  async (req, res)=>{
         try {
