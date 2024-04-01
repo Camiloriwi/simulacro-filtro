@@ -9,14 +9,224 @@ mongodb+srv://camilo:nFgFrb0li3JxbLr6@node.ktvwioe.mongodb.net/
 
 
 
-paquetes para instalar
+
+principales pasos para realizar un ejercicio con node.js y utilizando los  metodos CRUD:
+
+1. crear una carpeta llamada: 'src'
+
+2. dentro de la carpeta: 'src' incluir  otras carpetas como lo son:  'config',  'controllers' , 'middleware'  ,  'models' ,  'routers' , y opcional 'services'
+
+3. dentro de la carpeta models: crear un archivo llmado: 'model.js' que es donde con: 'const userSchema = new mongoose.Schema({})' crearemos  el schema con todos lo campos que vamos a necesitar
+
+3.1 ademas dentro de este mismo archivo acedemos a la colecion de la base de datos con: 'const user = mongoose.model('ejemplos',userSchema)'
+
+4. luego por cada archivo creado ya con nuestra logica exportamos nuestra funcionalida principal ejemplo: 'module.exports = user;
+
+5.  dentro de la carpeta config: crear un archivo llmado: 'database.js' que es donde se ara la conexion con la base de datos
+
+5.1 en esta misma solo utilizaremos mongoose  para conetar la colecion ejemplo:
+
+let user;
+const connectDB = async () => {
+   
+    try {
+        if (!user) {
+            user= mongoose.model('ejemplos', require('../models/model').schema);
+        }
+        await mongoose.connect('mongodb+srv://camilomanco2005:v6ZWgy5WkuGWDl5P@camilo.lfzjq3i.mongodb.net/')
+        .then(()=>{console.log('conneted database')})
+        .catch((err)=>{console.log(err)});
+    } catch (err) {
+        console.error('Failed to connect database:', err);
+        process.exit(1);
+    }
+};
+
+6. luego dentro de la carpeta middleware  creamos un archivo llamado: 'auth.js' que es donde aremos las validaciones de segurida con pasport y jwt_sercret ejemplo:
+
+const passport = require("passport");
+const { Strategy, ExtractJwt } = require("passport-jwt")
+const user = require('../models/model');
+const jwt_secret = "##%camilo131asdasd##";
+
+const strategy = new Strategy( 
+    {
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: jwt_secret
+    },
+    async (jwtPayload, done) => {
+        try {
+            const user = await user.findById({userid: jwtPayload._id})
+            if(!user) {
+                const error = new Error("User not found")
+                console.log(error)
+            }
+            done(null, user) 
+
+        } catch (error) {
+            done(error)
+        }
+    }
+);
+
+passport.use(strategy);
+const initialize = () => {
+    return passport.initialize();
+};
+const authenticate = () => {
+    return passport.authenticate("jwt", {session:false})
+} ;
+
+module.exports = {
+    initialize,
+    authenticate,
+};
 
 
-mongodb
-express
-body-parser
-nodemon
-mongoose
+7. luego dentro de la carpeta controllers crearemos un archivo llamado: 'control.js'  que es  donde realizaremos todos los metodos CRUD :aqui utilizaremos ejemplo:
 
-para instalar usar
-npm i
+const user = require('../models/model');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const jwt_secret = "##%dasdsadasd##";
+
+7.1  y luego dentro de un objeto global las consultas:
+
+const userControl ={
+    getUsers: async (req, res)=>{aqui la logica}
+    createUser: async (req, res)=>{aqui la logica}
+    updateUser: async (req, res)=>{aqui la logica}
+    deleteUser: async (req, res)=>{aqui la logica}
+    register: async (req, res) => {aqui la logica}
+    login: async (req, res) => {aqui la logica}
+};
+7.2 exportar el objeto global
+
+
+8. ahora dentro de la carpeta  routers creamos un archivo: 'ruter.js'  que es donde crearemos la empoint para cada una de las consultas ejemplo:
+
+const express = require('express');
+const router = express.Router();
+const userControl = require('../controllers.js/control');
+const auth = require("../midleware/auth");
+
+8.1 ahora usamos las librerias y modulosimportados anteriormente ejemplo:
+
+router.get('/api/v1/users', auth.initialize(), userControl.getUsers);// empoint de la consulta 1
+router.post('/api/All/users',auth.initialize() userControl.createUser); // empoint de la consulta 2
+router.pacth('/api/All/id/:_id',auth.authenticate() userControl.updateUser);   // empoint de la consulta 3 
+router.delete('/api/All/id/:_id',auth.authenticate() userControl.deleteUser);  // empoint de la consulta 4 
+router.post('/api/All/register',auth.authenticate() userControl.register);  // empoint de la consulta 5 
+router.post('/api/All/login',auth.authenticate() userControl.login);  // empoint de la consulta 6
+
+
+9. ahora fuera de la carpeta 'src' creamos un archivo 'index.js' o 'app.js'  qu es donde crearemos  la logica para el puerto que vamos a utilizar y las demas librerias ejemplo:
+
+const express = require('express');
+const bodyParser = require('body-parser')
+const connectDB = require('./src/config/DB');
+const routes = require('./src/routers/ruoter');
+const auth = require("./src/midleware/auth");
+
+const app = express();
+// definiendo el puerto que utilizaremos 
+const port = 3000;
+// llamando la funcion que exportamos de connetion con la base de datos
+connectDB();
+// Analiza las solicitudes entrantes con el tipo de contenido application/json.
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(auth.initialize());
+// Configura las rutas
+app.use('/', routes);
+app.listen(port,()=>{console.log(`connected at http://localhost:${port}`)});
+
+
+10. ahora tambien fuera de la carpeta src creamos los archivos  index.html  register.html  y login.html  que son donde crearemos los formularios para obtener la informacion del usuario y guardarla en la base de datos:ejemplo:}
+
+<form action="http://localhost:3000/api/v1/users" method="post"> 
+    <label class="form-label">Name</label>
+    <input type="text" class="form-control"  name="name">
+</form>      
+
+11.  ahora o tambien instalamos las siguientes librerias con:  ' npm i  mongodb express mongoose nodemon bcrypt  body-parser  jsonwebtoken passport passport-jwt'
+
+12. creamos un repositorio de github para ir subiendo todos nuestros cambios a medidad que relizamos nuestro codigo  tambien incluir un gitignore para no subirlos modulos
+
+13 si creamos services dentro creamos un archivo 'services.js' conla siguiente logica para crear contraseñas:
+
+const  gnerarPassword = (length = 8) => {
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+        const rdmIndex = Math.floor(Math.random() * charset.length);
+        password += charset[rdmIndex];
+    }
+    return password;
+};
+
+export default gnerarPassword;
+
+
+14. ejemplo de register:
+
+register: async (req, res) => {
+        try {
+            const users = await user.find();
+            const { name, email, password } = req.body;
+
+            const userData = {
+                userid: users.length + 1,
+                name: name,
+                email: email,
+                // encriptando la contraseña del usuario para no dejarla espuesta  sino con se encripta con la libreria bcrypt.hash con rango de 10 caracteres de incriptacion minima
+                password: await bcrypt.hash(password,10),
+            }
+
+            const newUser = new user(userData);
+            // guardando al informacion  del usuario en la base de datos
+            const savedUser = await newUser.save();
+            res.status(201).json(savedUser)
+
+        } catch (error) {
+            console.error('Error al registrar el usuario:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    },
+
+
+15. ejemplo de login:
+
+ login: async (req, res) => {
+        try {
+            // obteniendo los datos ingresados por el usuario
+            const { email, password } = req.body;
+            // buscando que el email ingresado si exista en la base de datos
+            const user = await user.find({email: email});
+            // validacion que nos indica que si user no existe  no retorne un estatus 400 que nos indica  que la contraseña y el email no coinciden o son incorrectos
+            if (!user) {
+            return res.status(400).json({message: "Invalid username or password"});
+            }
+            // comparando la contraseña encriptada con bcrypt.hash  y la ingresada por el usuario con bcrypt.compare
+            const isPasswordValid = await bcrypt.compare(password, user[0].password);
+            // si las contraseñas no coinciden nos retorna un status 400  que nos indica que  la contraseña no conciden
+            if (!isPasswordValid) {
+                return res.status(400).json({message: "Invalid username or password"});
+            }
+             // si las contraseñas coinciden generamos un token que nos servira en este caso por 1 hora
+            const token = jwt.sign({userid: user.id }, jwt_secret, {
+                expiresIn: "1h"
+            })
+            // mensaje que indica que el usuario inicio secion exitosamente
+            res.json({message: "Logged in successfully", token})
+
+
+        } catch (error) {
+            console.error('Error al loguear el usuario:', error);
+            res.status(500).json({ message: 'Internal Server Error' });
+        }
+    }
+
+
+
+17. eso es todo llave a codear como un putas:
